@@ -1,9 +1,15 @@
 import pandas as pd
 import numpy as np
-from datetime import dateime
+import random
+from datetime import datetime
 
 data = pd.read_csv("../Data/train.csv")
-train.dtypes
+data.dtypes
+
+random.seed(131)
+df = data.sample(frac=0.01)
+
+633672, 17
 
 # rows : 63367217
 # cols : 17
@@ -38,24 +44,5 @@ def res_dist(df,colname,target,idval):
 
 freegeoip.net/{format}/{IP_or_hostname}
 
-df[''] = df['ConversionDate'] - df['ClickDate']
-
-coltype = 	{
-			'ID' : int, 
-			'Country' : str, 
-			'Carrier' : int, 
-			'TrafficType' : str, 
-			'ClickDate' : str, 
-			'Device' : str,
-			'Browser' : str, 
-			'OS' : str, 
-			'RefererUrl' : str, 
-			'UserIp' : str, 
-			'ConversionStatus' : bool,
-			'ConversionDate' : str, 
-			'ConversionPayOut' : float, 
-			'publisherId' : int,
-			'subPublisherId' : int, 
-			'advertiserCampaignId' : int,
-			'Fraud' : int
-			}
+df = df[['ID','ClickDate','ConversionStatus','ConversionDate']]
+df[df['ConversionStatus'] == True].head()
