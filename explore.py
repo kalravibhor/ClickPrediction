@@ -24,42 +24,29 @@ coltype = 	{
 			'advertiserCampaignId' : int,
 			'Fraud' : int
 			}
-all_cols = ['ID', 'Country', 'Carrier', 'TrafficType', 'ClickDate', 'Device', 'Browser', 'OS', 
-			'RefererUrl', 'UserIp', 'ConversionStatus', 'ConversionDate', 'ConversionPayOut', 
-			'publisherId', 'subPublisherId', 'advertiserCampaignId', 'Fraud']
+all_cols = ['ID', 'Country', 'Carrier', 'TrafficType', 'ClickDate', 'Device', 'Browser', 'OS', 'RefererUrl', 'UserIp', 'ConversionStatus', 'ConversionDate', 'ConversionPayOut', 'publisherId', 'subPublisherId', 'advertiserCampaignId', 'Fraud']
+col_lst_mod = [ 'Label', 'Country', 'Carrier', 'TrafficType', 'Device', 'Browser', 'OS', 'RefererUrl', 'UserIp', 'publisherId', 'advertiserCampaignId', 'Fraud', 'clickdateDay', 'clickdateHour', 'clickdateDayOfWeek', 'ct_ids_hour', 'ct_OS', 'ct_Carrier', 'ct_Country', 'ct_Device', 'ct_Browser', 'ct_RefererUrl', 'ct_publisherId', 'ct_subPublisherId', 'ct_advertiserCampaignId']
 countval = 'ID'
 
 random.seed(131)
-data = pd.read_csv("../Data/train.csv")
-df = data.sample(frac=0.005)
 
-df['ClickDate'] = pd.to_datetime(df['ClickDate'])
-train = df.loc[(df['ClickDate'] <= datetime.date(year=2017,month=8,day=27)) & (df['ClickDate'].notnull()),:]
-test = df[(df['ClickDate'] > datetime.date(year=2017,month=8,day=27)) & (df['ClickDate'].notnull())]
-ignore = df[df['ClickDate'].isnull()]
-
-train = fn.data_prep(train,coltype)
-test = fn.data_prep(test,coltype)
-
-train.columns.tolist()
-test.columns.tolist()
-
-train = train.rename(columns={'ConversionStatus': 'Label'})
-test = test.rename(columns={'ConversionStatus': 'Label'})
-
-train = train.drop('ID',axis = 1)
-test = test.drop('ID',axis = 1)
-
-train[['Country', 'Carrier', 'TrafficType', 'Device', 'Browser', 'OS', 'RefererUrl', 'UserIp',
-	'Label', 'publisherId', 'subPublisherId', 'advertiserCampaignId', 'Fraud', 'cldotw',
-	'cltod', 'ct_ids_hour', 'ct_OS', 'ct_Carrier', 'ct_Country', 'ct_Device', 'ct_Browser', 'ct_RefererUrl',
-	'ct_publisherId', 'ct_subPublisherId', 'ct_advertiserCampaignId']] = train[['Label','Country', 'Carrier', 'TrafficType',
-	'Device', 'Browser', 'OS', 'RefererUrl', 'UserIp','publisherId', 'subPublisherId', 'advertiserCampaignId',
-	'Fraud', 'cldotw','cltod', 'ct_ids_hour', 'ct_OS', 'ct_Carrier', 'ct_Country', 'ct_Device', 'ct_Browser',
-	'ct_RefererUrl','ct_publisherId', 'ct_subPublisherId', 'ct_advertiserCampaignId']]
-
-train.to_csv('../Others/train.txt', sep='\t', index=False, header=False)
-test.to_csv('../Others/test.txt', sep='\t', index=False, header=False)
+for i in range(13):
+	if (i != 12):
+		train = pd.read_csv("../Data/train.csv",nrows = 4000000,skiprows = (i*5000000) + 1,header = None,names = all_cols)
+		test = pd.read_csv("../Data/train.csv",nrows = 1000000,skiprows = 4000000 + (i*5000000) + 1,header = None,names = all_cols)
+	else:
+		train = pd.read_csv("../Data/train.csv",nrows = 2500000,skiprows = (i*5000000) + 1,header = None,names = all_cols)
+		test = pd.read_csv("../Data/train.csv",skiprows = 2500000 + (i*5000000) + 1,header = None,names = all_cols)
+	train = fn.data_prep(train,coltype)
+	test = fn.data_prep(test,coltype)
+	train = train.rename(columns={'ConversionStatus': 'Label'})
+	test = test.rename(columns={'ConversionStatus': 'Label'})
+	train = train.drop('ID',axis = 1)
+	test = test.drop('ID',axis = 1)
+	train = train[col_lst_mod]
+	test = test[col_lst_mod-['Label']]
+	train.to_csv('../Others/train_' + str(i+1) + '.txt', sep='\t', index=False, header=False)
+	test.to_csv('../Others/test_' + str(i+1) + '.txt', sep='\t', index=False, header=False)
 
 # data.dtypes
 # data['ConversionStatus'].value_counts()
