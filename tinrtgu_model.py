@@ -7,13 +7,13 @@ from pymmh3 import hash
 
 # parameters #################################################################
 
-train = 'train.txt'  # path to training file
-test = 'test.txt'  # path to testing file
+train = '../Data/train1.txt'  # path to training file
+test = '../Data/test1.txt'  # path to testing file
 
-logbatch = 100000
+logbatch = 10000
 dotest = True
 
-D = 2 ** 24    # number of weights use for learning
+D = 2 ** 12    # number of weights use for learning
 
 signed = False    # Use signed hash? Set to False for to reduce number of hash calls
 
@@ -30,7 +30,7 @@ adapt = 1.        # Use adagrad, sets it as power of adaptive factor. >1 will am
 fudge = .5        # Fudge factor
 
 
-header = ['Label','i1','i2','i3','i4','i5','i6','i7','i8','i9','i10','i11','i12','i13','c1','c2','c3','c4','c5','c6','c7','c8','c9','c10','c11','c12','c13','c14','c15','c16','c17','c18','c19','c20','c21','c22','c23','c24','c25','c26']
+header = ['Label', 'Country', 'Carrier', 'TrafficType', 'Device', 'Browser', 'OS', 'RefererUrl', 'UserIp', 'publisherId', 'advertiserCampaignId', 'Fraud', 'clickdateDay', 'clickdateHour', 'clickdateDayOfWeek', 'ct_ids_hour', 'ct_OS', 'ct_Carrier', 'ct_Country', 'ct_Device', 'ct_Browser', 'ct_RefererUrl', 'ct_publisherId', 'ct_subPublisherId', 'ct_advertiserCampaignId']
 
 # function definitions #######################################################
 

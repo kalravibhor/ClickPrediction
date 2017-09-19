@@ -61,32 +61,25 @@ def data_prep(df,coltype):
 
 def data_prep_pos(df):
 	scaler = MinMaxScaler()
-	keep_list = ['ID', 'Country', 'Carrier', 'TrafficType', 'ClickDate', 'Device', 'Browser', 'OS', 
-				'RefererUrl', 'UserIp', 'ConversionPayOut', 'ConversionDate', 'publisherId', 'subPublisherId', 
-				'advertiserCampaignId', 'Fraud']
-	df = df.loc[df['ConversionStatus']==True,keep_list]
+	keep_list = ['ID', 'Country', 'Carrier', 'TrafficType', 'ClickDate', 'Device', 'Browser', 'OS', 'RefererUrl', 'UserIp', 'ConversionPayOut', 'ConversionDate', 'publisherId', 'subPublisherId', 'advertiserCampaignId', 'Fraud']
+	df = df.loc[df['ConversionStatus']==True, keep_list]
 	df = impute(df,df.columns.tolist())
-	df['ClickDate'] = df['ClickDate'].astype(object)
-	df['ClickDate'] = df['ClickDate'].apply(lambda x: x if not pd.isnull(x) else '')
 	df['ClickDate'] =  pd.to_datetime(df['ClickDate'])
-	df['ConversionDate'] = df['ConversionDate'].astype(object)
-	df['ConversionDate'] = df['ConversionDate'].apply(lambda x: x if not pd.isnull(x) else '')
+	df['clickdateDate'] = df['ClickDate'].dt.date
+	df["clickdateDay"] = df.ClickDate.dt.day
+	df["clickdateHour"] = df.ClickDate.dt.hour
+	df["clickdateDayOfWeek"] = df.ClickDate.dt.weekday
 	df['ConversionDate'] =  pd.to_datetime(df['ConversionDate'])
-	df['cldotw'] = df['ClickDate'].dt.dayofweek
-	df['temp'] = df['ClickDate'].dt.time
-	df['temp'] = df['temp'].astype('str')
-	df['codotw'] = df['ConversionDate'].dt.dayofweek
-	df['temp2'] = df['ConversionDate'].dt.time
-	df['temp2'] = df['temp2'].astype('str')
-	df.loc[df['ClickDate'].notnull(),'cltod'] = df.loc[df['ClickDate'].notnull(),'temp'].apply(lambda x: (int(x.split(':')[0])*3600) + (int(x.split(':')[1])*60) + (int(x.split(':')[2])))
-	df.loc[df['ConversionDate'].notnull(),'cotod'] = df.loc[df['ConversionDate'].notnull(),'temp2'].apply(lambda x: (int(x.split(':')[0])*3600) + (int(x.split(':')[1])*60) + (int(x.split(':')[2])))
-	df.loc[df['ConversionDate'].notnull(),'daysclco'] = df.loc[df['ConversionDate'].notnull(),'ConversionDate'].dt.dayofyear - df.loc[df['ConversionDate'].notnull(),'ClickDate'].dt.dayofyear
-	df['clickhour'] = df['ClickDate'].dt.hour
-	df['cldate'] = df['ClickDate'].dt.date
-	table = df[['cldate','clickhour','ID']].drop_duplicates(subset=['cldate','clickhour','ID'])
-	table = table.pivot_table(index = ['cldate','clickhour'],values = 'ID',aggfunc='count')
+	df['conversiondateDate'] = df['ConversionDate'].dt.date
+	df["conversiondateDay"] = df.ConversionDate.dt.day
+	df["conversiondateHour"] = df.ConversionDate.dt.hour
+	df["conversiondateDayofWeek"] = df.ConversionDate.dt.weekday
+	table = df[['clickdateDate','clickdateHour','ID']].drop_duplicates(subset=['clickdateDate','clickdateHour','ID'])
+	table = table.pivot_table(index = ['clickdateDate','clickdateHour'],values = 'ID',aggfunc='count')
 	table = table.reset_index()
-	table.columns = ['cldate','clickhour','ct_ids_hour']
+	table.columns = ['clickdateDate','clickdateHour','ct_ids_hour']
+	df = df.merge(table,how='left',on=['clickdateDate','clickdateHour'])
+	
 	df = df.merge(table,how='left',on=['cldate','clickhour'])
 	df['ConversionStatus'] = df['ConversionStatus']*1
 	df['Fraud'] = df['Fraud'].astype(int)
